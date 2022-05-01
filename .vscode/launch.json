@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Run raycli",
+            "cargo": {
+                "args": [
+                    "run",
+                    "--bin",
+                    "raycli"
+                ],
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

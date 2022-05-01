@@ -1,0 +1,10 @@
+[workspace]
+
+default-members = ["webapp", "raycli"]
+
+members = [
+    "raylib",
+    "webapp",
+    "raycli",
+    "xtask"
+]
