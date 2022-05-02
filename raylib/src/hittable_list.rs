@@ -1,3 +1,5 @@
+use crate::hittable::DidHit;
+
 use super::{
     hittable::{HitRecord, Hittable},
     ray::Ray,
@@ -22,19 +24,26 @@ impl HittableList {
 }
 
 impl Hittable for HittableList {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> DidHit {
         let mut temp_rec = HitRecord::default();
         let mut hit_anything = false;
         let mut closest_so_far = t_max;
 
         for obj in &self.objects {
-            if obj.hit(r, t_min, closest_so_far, &mut temp_rec) {
-                hit_anything = true;
-                closest_so_far = temp_rec.t;
-                rec.overwrite(&temp_rec);
+            match obj.hit(r, t_min, closest_so_far) {
+                DidHit::Hit(rec) => {
+                    hit_anything = true;
+                    temp_rec = rec;
+                    closest_so_far = temp_rec.t;
+                }
+                _ => {}
             }
         }
 
-        hit_anything
+        if hit_anything {
+            DidHit::Hit(temp_rec)
+        } else {
+            DidHit::Miss
+        }
     }
 }

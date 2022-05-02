@@ -1,15 +1,16 @@
 use crate::{
     camera::Camera,
+    hittable::DidHit,
     util::random_double,
     vec3::{random_unit_vector, rgba_multisampled},
 };
 
 use super::{
-    hittable::{HitRecord, Hittable},
+    hittable::Hittable,
     hittable_list::HittableList,
     ray::Ray,
     sphere::Sphere,
-    vec3::{dot, rgba, unit_vector, Color, Point3},
+    vec3::{dot, unit_vector, Color, Point3},
     Vec3,
 };
 
@@ -18,14 +19,16 @@ fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Color {
         return Color::new(0.0, 0.0, 0.0);
     }
 
-    let mut rec = HitRecord::default();
-    if world.hit(r, 0.001, f64::INFINITY, &mut rec) {
-        let target = rec.p + rec.normal + random_unit_vector();
-        0.5 * ray_color(&Ray::new(rec.p, target - rec.p), world, depth - 1)
-    } else {
-        let unit_direction = unit_vector(r.direction());
-        let t = 0.5 * (unit_direction.y() + 1.0);
-        (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
+    match world.hit(r, 0.001, f64::INFINITY) {
+        DidHit::Hit(rec) => {
+            let target = rec.p + rec.normal + random_unit_vector();
+            0.5 * ray_color(&Ray::new(rec.p, target - rec.p), world, depth - 1)
+        }
+        DidHit::Miss => {
+            let unit_direction = unit_vector(r.direction());
+            let t = 0.5 * (unit_direction.y() + 1.0);
+            (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
+        }
     }
 }
 
