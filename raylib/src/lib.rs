@@ -1,6 +1,7 @@
 mod camera;
 mod hittable;
 mod hittable_list;
+mod material;
 mod ray;
 mod raytracer;
 mod sphere;

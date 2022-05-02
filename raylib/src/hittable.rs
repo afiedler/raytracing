@@ -1,3 +1,10 @@
+use std::rc::Rc;
+
+use crate::{
+    material::{Lambertian, Material},
+    vec3::Color,
+};
+
 use super::{
     ray::Ray,
     vec3::{dot, Point3},
@@ -14,6 +21,7 @@ pub struct HitRecord {
     pub normal: Vec3,
     pub t: f64,
     pub front_face: bool,
+    pub material: Rc<dyn Material>,
 }
 
 impl HitRecord {
@@ -26,12 +34,17 @@ impl HitRecord {
         }
     }
 
+    pub fn set_material(&mut self, material: &Rc<dyn Material>) {
+        self.material = material.clone()
+    }
+
     pub fn default() -> HitRecord {
         HitRecord {
             p: Point3::new(0.0, 0.0, 0.0),
             normal: Vec3::new(0.0, 0.0, 0.0),
             t: 0.0,
             front_face: false,
+            material: Rc::new(Lambertian::new(Color::new(1.0, 0.0, 0.0))),
         }
     }
 }

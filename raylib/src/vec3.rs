@@ -47,6 +47,10 @@ impl Vec3 {
     pub fn length_squared(&self) -> f64 {
         self.e[0] * self.e[0] + self.e[1] * self.e[1] + self.e[2] * self.e[2]
     }
+    pub fn near_zero(&self) -> bool {
+        let s = 1e-8;
+        (self.e[0].abs() < s) && (self.e[1].abs() < s) && (self.e[2].abs() < s)
+    }
 }
 
 impl ops::Neg for Vec3 {
@@ -111,6 +115,17 @@ impl ops::Sub for &Vec3 {
     }
 }
 
+impl ops::Sub<Vec3> for &Vec3 {
+    type Output = Vec3;
+    fn sub(self, other: Vec3) -> Vec3 {
+        Vec3::new(
+            self.e[0] - other.e[0],
+            self.e[1] - other.e[1],
+            self.e[2] - other.e[2],
+        )
+    }
+}
+
 impl ops::Mul for Vec3 {
     type Output = Self;
 
@@ -136,6 +151,13 @@ impl ops::Mul<Vec3> for f64 {
 
     fn mul(self, rhs: Vec3) -> Vec3 {
         rhs * self
+    }
+}
+
+impl ops::Mul<&Vec3> for f64 {
+    type Output = Vec3;
+    fn mul(self, rhs: &Vec3) -> Vec3 {
+        *rhs * self
     }
 }
 
@@ -165,6 +187,10 @@ pub fn unit_vector(v: &Vec3) -> Vec3 {
 
 pub fn random_unit_vector() -> Vec3 {
     unit_vector(&Vec3::random_in_unit_sphere())
+}
+
+pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
+    v - 2.0 * dot(v, n) * n
 }
 
 pub fn rgba(color: &Color) -> (u8, u8, u8, u8) {

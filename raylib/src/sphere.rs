@@ -1,4 +1,6 @@
-use crate::hittable::DidHit;
+use std::rc::Rc;
+
+use crate::{hittable::DidHit, material::Material};
 
 use super::{
     hittable::{HitRecord, Hittable},
@@ -9,11 +11,16 @@ use super::{
 pub struct Sphere {
     center: Point3,
     radius: f64,
+    material: Rc<dyn Material>,
 }
 
 impl Sphere {
-    pub fn new(center: Point3, radius: f64) -> Self {
-        Sphere { center, radius }
+    pub fn new(center: Point3, radius: f64, material: Rc<dyn Material>) -> Self {
+        Sphere {
+            center,
+            radius,
+            material,
+        }
     }
 }
 
@@ -43,6 +50,7 @@ impl Hittable for Sphere {
             rec.p = r.at(rec.t);
             let outward_normal = (rec.p - self.center) / self.radius;
             rec.set_face_normal(r, &outward_normal);
+            rec.set_material(&self.material);
 
             return DidHit::Hit(rec);
         }

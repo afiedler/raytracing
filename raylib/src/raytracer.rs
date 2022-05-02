@@ -1,8 +1,11 @@
+use std::rc::Rc;
+
 use crate::{
     camera::Camera,
     hittable::DidHit,
+    material::{Lambertian, Metal},
     util::random_double,
-    vec3::{random_unit_vector, rgba_multisampled},
+    vec3::rgba_multisampled,
 };
 
 use super::{
@@ -21,8 +24,14 @@ fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Color {
 
     match world.hit(r, 0.001, f64::INFINITY) {
         DidHit::Hit(rec) => {
-            let target = rec.p + rec.normal + random_unit_vector();
-            0.5 * ray_color(&Ray::new(rec.p, target - rec.p), world, depth - 1)
+            let (hit, attenuation, scattered) = rec.material.scatter(r, &rec);
+            if hit {
+                attenuation * ray_color(&scattered, world, depth - 1)
+            } else {
+                Color::new(0.0, 0.0, 0.0)
+            }
+            // let target = rec.p + rec.normal + random_unit_vector();
+            // 0.5 * ray_color(&Ray::new(rec.p, target - rec.p), world, depth - 1)
         }
         DidHit::Miss => {
             let unit_direction = unit_vector(r.direction());
@@ -52,9 +61,33 @@ pub fn raytracer() -> Vec<u8> {
     let max_depth = 50;
     let samples_per_pixel = 100;
 
+    // World
     let mut world = HittableList::new();
-    world.add(Box::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5)));
-    world.add(Box::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)));
+    let material_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
+    let material_center = Rc::new(Lambertian::new(Color::new(0.7, 0.3, 0.3)));
+    let material_left = Rc::new(Metal::new(Color::new(0.8, 0.8, 0.8)));
+    let material_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2)));
+
+    world.add(Box::new(Sphere::new(
+        Point3::new(0.0, -100.5, -1.0),
+        100.0,
+        material_ground,
+    )));
+    world.add(Box::new(Sphere::new(
+        Point3::new(0.0, 0.0, -1.0),
+        0.5,
+        material_center,
+    )));
+    world.add(Box::new(Sphere::new(
+        Point3::new(-1.0, 0.0, -1.0),
+        0.5,
+        material_left,
+    )));
+    world.add(Box::new(Sphere::new(
+        Point3::new(1.0, 0.0, -1.0),
+        0.5,
+        material_right,
+    )));
 
     let viewport_height = 2.0;
     let viewport_width = aspect_ratio * viewport_height;
