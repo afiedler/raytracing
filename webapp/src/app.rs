@@ -17,7 +17,7 @@ impl Component for Greet {
 
     fn create(_ctx: &Context<Self>) -> Self {
         raylib::hello_raylib();
-        let image = raytracer();
+        let (width, height, image) = raytracer();
         Self {
             title: "Raytracing".to_string(),
             msg: "Output".to_string(),

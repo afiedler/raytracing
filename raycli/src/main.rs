@@ -3,11 +3,11 @@ use raylib::raytracer;
 
 fn main() {
     println!("Raytracing...");
-    let mut image = RgbaImage::new(400, 225);
-    let buf = raytracer();
+    let (width, height, buf) = raytracer();
+    let mut image = RgbaImage::new(width, height);
     let mut cursor = 0usize;
-    for j in 0..225u32 {
-        for i in 0..400u32 {
+    for j in 0..height {
+        for i in 0..width {
             image.put_pixel(
                 i,
                 j,
@@ -23,5 +23,5 @@ fn main() {
         }
     }
 
-    image.save_with_format("./output.png", image::ImageFormat::Png);
+    image.save_with_format("./output-draft.png", image::ImageFormat::Png);
 }
