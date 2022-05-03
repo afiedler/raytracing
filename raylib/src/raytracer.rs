@@ -6,6 +6,7 @@ use crate::{
     material::{Dielectric, Lambertian, Metal},
     util::random_double,
     vec3::rgba_multisampled,
+    Vec3,
 };
 
 use super::{
@@ -88,7 +89,13 @@ pub fn raytracer() -> Vec<u8> {
         material_right,
     )));
 
-    let cam = Camera::default();
+    let cam = Camera::new(
+        &Point3::new(-2.0, 2.0, 1.0),
+        &Point3::new(0.0, 0.0, -1.0),
+        &Vec3::new(0.0, 1.0, 0.0),
+        90.0,
+        aspect_ratio,
+    );
 
     let mut image: Vec<u8> = vec![0; (image_width * image_height * 4) as usize];
 
