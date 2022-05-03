@@ -11,5 +11,6 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 log = "0.4.6"
 lazy_static = "1.4.0"
+overload = "0.1"
 
 [dev-dependencies]

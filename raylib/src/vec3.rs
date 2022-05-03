@@ -1,5 +1,7 @@
 use std::ops::{self, Range};
 
+use overload::overload;
+
 use crate::util::{clamp, random_double, random_double_in_range};
 
 pub type Point3 = Vec3;
@@ -82,92 +84,58 @@ impl ops::DivAssign<f64> for Vec3 {
     }
 }
 
-impl ops::Add for Vec3 {
-    type Output = Self;
-    fn add(self, other: Self) -> Self {
-        Self::new(
-            self.e[0] + other.e[0],
-            self.e[1] + other.e[1],
-            self.e[2] + other.e[2],
-        )
+// Add
+overload!((a: ?Vec3) + (b: ?Vec3) -> Vec3 {
+    Vec3 {
+        e: [
+            a.e[0] + b.e[0],
+            a.e[1] + b.e[1],
+            a.e[2] + b.e[2]
+        ]
     }
-}
+});
 
-impl ops::Sub for Vec3 {
-    type Output = Self;
-    fn sub(self, other: Self) -> Self {
-        Self::new(
-            self.e[0] - other.e[0],
-            self.e[1] - other.e[1],
-            self.e[2] - other.e[2],
-        )
+// Subtract
+overload!((a: ?Vec3) - (b: ?Vec3) -> Vec3 {
+    Vec3 {
+        e: [
+            a.e[0] - b.e[0],
+            a.e[1] - b.e[1],
+            a.e[2] - b.e[2]
+        ]
     }
-}
+});
 
-impl ops::Sub for &Vec3 {
-    type Output = Vec3;
-    fn sub(self, other: Self) -> Vec3 {
-        Vec3::new(
-            self.e[0] - other.e[0],
-            self.e[1] - other.e[1],
-            self.e[2] - other.e[2],
-        )
+// Multiply
+overload!((a: ?Vec3) * (b: ?Vec3) -> Vec3 {
+    Vec3 {
+        e: [
+            a.e[0] * b.e[0],
+            a.e[1] * b.e[1],
+            a.e[2] * b.e[2]
+        ]
     }
-}
-
-impl ops::Sub<Vec3> for &Vec3 {
-    type Output = Vec3;
-    fn sub(self, other: Vec3) -> Vec3 {
-        Vec3::new(
-            self.e[0] - other.e[0],
-            self.e[1] - other.e[1],
-            self.e[2] - other.e[2],
-        )
+});
+overload!((a: f64) * (b: ?Vec3) -> Vec3 {
+    Vec3 {
+        e: [
+            a * b.e[0],
+            a * b.e[1],
+            a * b.e[2]
+        ]
     }
-}
+});
 
-impl ops::Mul for Vec3 {
-    type Output = Self;
-
-    fn mul(self, rhs: Self) -> Self {
-        Self::new(
-            self.e[0] * rhs.e[0],
-            self.e[1] * rhs.e[1],
-            self.e[2] * rhs.e[2],
-        )
+// Divide
+overload!((a: ?Vec3) / (b: f64) -> Vec3 {
+    Vec3 {
+        e: [
+            a.e[0] / b,
+            a.e[1] / b,
+            a.e[2] / b
+        ]
     }
-}
-
-impl ops::Mul<f64> for Vec3 {
-    type Output = Self;
-
-    fn mul(self, rhs: f64) -> Self {
-        Self::new(self.e[0] * rhs, self.e[1] * rhs, self.e[2] * rhs)
-    }
-}
-
-impl ops::Mul<Vec3> for f64 {
-    type Output = Vec3;
-
-    fn mul(self, rhs: Vec3) -> Vec3 {
-        rhs * self
-    }
-}
-
-impl ops::Mul<&Vec3> for f64 {
-    type Output = Vec3;
-    fn mul(self, rhs: &Vec3) -> Vec3 {
-        *rhs * self
-    }
-}
-
-impl ops::Div<f64> for Vec3 {
-    type Output = Vec3;
-
-    fn div(self, rhs: f64) -> Vec3 {
-        Vec3::new(self.e[0] / rhs, self.e[1] / rhs, self.e[2] / rhs)
-    }
-}
+});
 
 pub fn dot(u: &Vec3, v: &Vec3) -> f64 {
     u.e[0] * v.e[0] + u.e[1] * v.e[1] + u.e[2] * v.e[2]

@@ -65,8 +65,8 @@ pub fn raytracer() -> Vec<u8> {
     let mut world = HittableList::new();
     let material_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
     let material_center = Rc::new(Lambertian::new(Color::new(0.7, 0.3, 0.3)));
-    let material_left = Rc::new(Metal::new(Color::new(0.8, 0.8, 0.8)));
-    let material_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2)));
+    let material_left = Rc::new(Metal::new(Color::new(0.8, 0.8, 0.8), 0.3));
+    let material_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 1.0));
 
     world.add(Box::new(Sphere::new(
         Point3::new(0.0, -100.5, -1.0),
@@ -89,19 +89,8 @@ pub fn raytracer() -> Vec<u8> {
         material_right,
     )));
 
-    let viewport_height = 2.0;
-    let viewport_width = aspect_ratio * viewport_height;
-    let focal_length = 1.0;
-
     let cam = Camera::default();
 
-    let origin = Point3::new(0.0, 0.0, 0.0);
-    let horizontal = Vec3::new(viewport_width, 0.0, 0.0);
-    let vertical = Vec3::new(0.0, viewport_height, 0.0);
-    let lower_left_corner =
-        origin - horizontal / 2.0 - vertical / 2.0 - Vec3::new(0.0, 0.0, focal_length);
-
-    //let mut image: Vec<u8> = Vec::with_capacity((image_width * image_height * 4) as usize);
     let mut image: Vec<u8> = vec![0; (image_width * image_height * 4) as usize];
 
     let (image_width_f, image_height_f) = (image_width as f64, image_height as f64);
@@ -119,7 +108,7 @@ pub fn raytracer() -> Vec<u8> {
 
             set_rgba(
                 &mut image,
-                image_width - i - 1,
+                i,
                 image_height - j - 1,
                 image_width,
                 rgba_multisampled(&pixel_color, samples_per_pixel),
