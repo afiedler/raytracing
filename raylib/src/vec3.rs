@@ -33,6 +33,21 @@ impl Vec3 {
         }
         p
     }
+    pub fn random_in_unit_disk() -> Self {
+        let mut p = Vec3::new(
+            random_double_in_range(&(-1.0..1.0)),
+            random_double_in_range(&(-1.0..1.0)),
+            0.0,
+        );
+        while p.length_squared() >= 1.0 {
+            p = Vec3::new(
+                random_double_in_range(&(-1.0..1.0)),
+                random_double_in_range(&(-1.0..1.0)),
+                0.0,
+            );
+        }
+        p
+    }
 
     pub fn x(&self) -> f64 {
         self.e[0]
@@ -118,6 +133,15 @@ overload!((a: f64) * (b: ?Vec3) -> Vec3 {
             a * b.e[0],
             a * b.e[1],
             a * b.e[2]
+        ]
+    }
+});
+overload!((a: ?Vec3) * (b: f64) -> Vec3 {
+    Vec3 {
+        e: [
+            a.e[0] * b,
+            a.e[1] * b,
+            a.e[2] * b
         ]
     }
 });
