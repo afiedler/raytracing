@@ -3,7 +3,6 @@
 ![Raytracer Output](output.png?raw=true "Raytracer Output")
 
 This is a Rust implementation of [Raytracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html).
-I don't have a ton of free time so it's taking a little longer the one weekend! I'm up to about Chapter 9.
 
 There is both a web app and a CLI within this repo.
 

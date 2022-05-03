@@ -3,7 +3,7 @@ use std::rc::Rc;
 use crate::{
     camera::Camera,
     hittable::DidHit,
-    material::{Lambertian, Metal},
+    material::{Dielectric, Lambertian, Metal},
     util::random_double,
     vec3::rgba_multisampled,
 };
@@ -14,7 +14,6 @@ use super::{
     ray::Ray,
     sphere::Sphere,
     vec3::{dot, unit_vector, Color, Point3},
-    Vec3,
 };
 
 fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Color {
@@ -64,9 +63,9 @@ pub fn raytracer() -> Vec<u8> {
     // World
     let mut world = HittableList::new();
     let material_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
-    let material_center = Rc::new(Lambertian::new(Color::new(0.7, 0.3, 0.3)));
-    let material_left = Rc::new(Metal::new(Color::new(0.8, 0.8, 0.8), 0.3));
-    let material_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 1.0));
+    let material_center = Rc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
+    let material_left = Rc::new(Dielectric::new(1.5));
+    let material_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.0));
 
     world.add(Box::new(Sphere::new(
         Point3::new(0.0, -100.5, -1.0),

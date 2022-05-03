@@ -1,8 +1,8 @@
 use crate::{
     hittable::HitRecord,
     ray::Ray,
-    util::clamp,
-    vec3::{dot, random_unit_vector, reflect, unit_vector, Color},
+    util::{clamp, random_double},
+    vec3::{dot, random_unit_vector, reflect, refract, unit_vector, Color},
     Vec3,
 };
 
@@ -59,5 +59,51 @@ impl Material for Metal {
             attenuation,
             scattered,
         )
+    }
+}
+
+pub struct Dielectric {
+    /// Index of refraction
+    ir: f64,
+}
+
+impl Dielectric {
+    pub fn new(ir: f64) -> Self {
+        Dielectric { ir }
+    }
+}
+
+fn reflectance(cosine: f64, ref_idx: f64) -> f64 {
+    // Use Schlick's approximation for reflectance.
+    let r0 = (1.0 - ref_idx) / (1.0 + ref_idx);
+    let r0 = r0 * r0;
+    r0 + (1.0 - r0) * (1.0 - cosine).powi(5)
+}
+
+impl Material for Dielectric {
+    fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> (bool, Color, Ray) {
+        let attenuation = Color::new(1.0, 1.0, 1.0);
+        let refraction_ratio = if rec.front_face {
+            1.0 / self.ir
+        } else {
+            self.ir
+        };
+
+        let unit_direction = unit_vector(r_in.direction());
+        let cos_theta = dot(&-unit_direction, &rec.normal).min(1.0);
+        let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
+
+        let cannot_refract = refraction_ratio * sin_theta > 1.0;
+
+        let direction =
+            if cannot_refract || reflectance(cos_theta, refraction_ratio) > random_double() {
+                reflect(&unit_direction, &rec.normal)
+            } else {
+                refract(&unit_direction, &rec.normal, refraction_ratio)
+            };
+
+        let scattered = Ray::new(rec.p, direction);
+
+        (true, attenuation, scattered)
     }
 }
