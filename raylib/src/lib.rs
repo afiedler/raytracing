@@ -8,7 +8,7 @@ mod sphere;
 mod util;
 mod vec3;
 
-pub use raytracer::raytracer;
+pub use raytracer::{random_scene, raytracer};
 pub use vec3::Vec3;
 
 pub fn hello_raylib() {

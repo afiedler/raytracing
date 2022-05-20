@@ -6,11 +6,11 @@ use super::{
 };
 
 pub struct HittableList {
-    objects: Vec<Box<dyn Hittable>>,
+    objects: Vec<Box<dyn Hittable + Send>>,
 }
 
 impl HittableList {
-    pub fn add(&mut self, object: Box<dyn Hittable>) {
+    pub fn add(&mut self, object: Box<dyn Hittable + Send>) {
         self.objects.push(object)
     }
 

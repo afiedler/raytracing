@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::sync::Arc;
 
 use crate::{
     material::{Lambertian, Material},
@@ -21,7 +21,7 @@ pub struct HitRecord {
     pub normal: Vec3,
     pub t: f64,
     pub front_face: bool,
-    pub material: Rc<dyn Material>,
+    pub material: Arc<dyn Material + Send + Sync>,
 }
 
 impl HitRecord {
@@ -34,7 +34,7 @@ impl HitRecord {
         }
     }
 
-    pub fn set_material(&mut self, material: &Rc<dyn Material>) {
+    pub fn set_material(&mut self, material: &Arc<dyn Material + Send + Sync>) {
         self.material = material.clone()
     }
 
@@ -44,7 +44,7 @@ impl HitRecord {
             normal: Vec3::new(0.0, 0.0, 0.0),
             t: 0.0,
             front_face: false,
-            material: Rc::new(Lambertian::new(Color::new(1.0, 0.0, 0.0))),
+            material: Arc::new(Lambertian::new(Color::new(1.0, 0.0, 0.0))),
         }
     }
 }

@@ -1,3 +1,4 @@
+use raylib::random_scene;
 use raylib::raytracer;
 use wasm_bindgen::Clamped;
 use wasm_bindgen::JsCast;
@@ -17,7 +18,8 @@ impl Component for Greet {
 
     fn create(_ctx: &Context<Self>) -> Self {
         raylib::hello_raylib();
-        let (width, height, image) = raytracer();
+        let world = random_scene();
+        let (width, height, image) = raytracer(&world);
         Self {
             title: "Raytracing".to_string(),
             msg: "Output".to_string(),

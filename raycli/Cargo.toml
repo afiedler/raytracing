@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 raylib = { path = "../raylib" }
 image = { version = "0.24"}
+rayon = "1.5"
