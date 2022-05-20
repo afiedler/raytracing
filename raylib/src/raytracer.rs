@@ -54,62 +54,86 @@ fn hit_sphere(center: &Point3, radius: f64, r: &Ray) -> f64 {
     }
 }
 
-pub fn raytracer(world: &HittableList) -> (u32, u32, Vec<u8>) {
-    let aspect_ratio = 3.0 / 2.0;
-    let image_width = 1200;
-    let image_height = (image_width as f64 / aspect_ratio) as u32;
-    let max_depth = 50;
-    let samples_per_pixel = 50;
-
-    // World
-
-    let look_from = Point3::new(13.0, 2.0, 3.0);
-    let look_at = Point3::new(0.0, 0.0, 0.0);
-
-    let cam = Camera::new(
-        &look_from,
-        &look_at,
-        &Vec3::new(0.0, 1.0, 0.0),
-        20.0,
-        aspect_ratio,
-        0.1,
-        10.0,
-    );
-
-    let mut image: Vec<u8> = vec![0; (image_width * image_height * 4) as usize];
-
-    let (image_width_f, image_height_f) = (image_width as f64, image_height as f64);
-
-    for j in 0..image_height {
-        for i in 0..image_width {
-            let mut pixel_color = Color::new(0.0, 0.0, 0.0);
-            let (i_f, j_f) = (i as f64, j as f64);
-            for _s in 0..samples_per_pixel {
-                let u = (i_f + random_double()) / (image_width_f - 1.0);
-                let v = (j_f + random_double()) / (image_height_f - 1.0);
-                let r = cam.get_ray(u, v);
-                pixel_color += ray_color(&r, world, max_depth);
-            }
-
-            set_rgba(
-                &mut image,
-                i,
-                image_height - j - 1,
-                image_width,
-                rgba_multisampled(&pixel_color, samples_per_pixel),
-            )
-        }
-        println!("Finished line {}", j);
-    }
-    (image_width, image_height, image)
+#[derive(Debug, Clone, Copy)]
+pub struct RaytracerOptions {
+    pub image_width: u32,
+    pub aspect_ratio: f64,
+    pub max_depth: u8,
+    pub samples_per_pixel: u32,
 }
 
-fn set_rgba(image: &mut Vec<u8>, x: u32, y: u32, width: u32, rgba: (u8, u8, u8, u8)) {
-    let i = (y * width + x) as usize;
-    image[4 * i] = rgba.0;
-    image[4 * i + 1] = rgba.1;
-    image[4 * i + 2] = rgba.2;
-    image[4 * i + 3] = rgba.3;
+impl Default for RaytracerOptions {
+    fn default() -> Self {
+        RaytracerOptions {
+            image_width: 1200,
+            aspect_ratio: 3.0 / 2.0,
+            max_depth: 50,
+            samples_per_pixel: 500,
+        }
+    }
+}
+
+pub struct Raytracer {
+    world: Arc<HittableList>,
+    camera: Camera,
+    options: RaytracerOptions,
+    image_height: u32,
+}
+
+impl Raytracer {
+    pub fn new<'a>(world: Arc<HittableList>, options: &RaytracerOptions) -> Raytracer {
+        let aspect_ratio = options.aspect_ratio;
+        let image_width = options.image_width;
+        let image_height = (image_width as f64 / aspect_ratio) as u32;
+
+        // World
+
+        let look_from = Point3::new(13.0, 2.0, 3.0);
+        let look_at = Point3::new(0.0, 0.0, 0.0);
+
+        let camera = Camera::new(
+            &look_from,
+            &look_at,
+            &Vec3::new(0.0, 1.0, 0.0),
+            20.0,
+            aspect_ratio,
+            0.1,
+            10.0,
+        );
+
+        Raytracer {
+            world,
+            camera,
+            options: options.clone(),
+            image_height,
+        }
+    }
+
+    pub fn trace_line(&self, y: u32) -> Vec<u8> {
+        let (image_width_f, image_height_f) =
+            (self.options.image_width as f64, self.image_height as f64);
+
+        let mut line = vec![0; (self.options.image_width as usize * 4)];
+
+        for i in 0..(self.options.image_width as usize) {
+            let mut pixel_color = Color::new(0.0, 0.0, 0.0);
+            let (i_f, j_f) = (i as f64, y as f64);
+            for _s in 0..self.options.samples_per_pixel {
+                let u = (i_f + random_double()) / (image_width_f - 1.0);
+                let v = (j_f + random_double()) / (image_height_f - 1.0);
+                let r = self.camera.get_ray(u, v);
+                pixel_color += ray_color(&r, self.world.as_ref(), self.options.max_depth as i32);
+            }
+
+            let rgba = rgba_multisampled(&pixel_color, self.options.samples_per_pixel);
+            line[4 * i] = rgba.0;
+            line[4 * i + 1] = rgba.1;
+            line[4 * i + 2] = rgba.2;
+            line[4 * i + 3] = rgba.3;
+        }
+        println!("Finished line {}", y);
+        line
+    }
 }
 
 pub fn random_scene() -> HittableList {

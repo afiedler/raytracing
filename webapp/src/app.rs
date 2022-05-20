@@ -1,5 +1,8 @@
+use std::sync::Arc;
+
 use raylib::random_scene;
-use raylib::raytracer;
+use raylib::Raytracer;
+use raylib::RaytracerOptions;
 use wasm_bindgen::Clamped;
 use wasm_bindgen::JsCast;
 use yew::prelude::*;
@@ -12,19 +15,39 @@ pub struct Greet {
     image: Vec<u8>,
 }
 
+const WIDTH: u32 = 300;
+const HEIGHT: u32 = 200;
+const ASPECT_RATIO: f64 = WIDTH as f64 / HEIGHT as f64;
+
 impl Component for Greet {
     type Message = ();
     type Properties = ();
 
     fn create(_ctx: &Context<Self>) -> Self {
         raylib::hello_raylib();
-        let world = random_scene();
-        let (width, height, image) = raytracer(&world);
+        let world = Arc::new(random_scene());
+        let raytracer = Raytracer::new(
+            world,
+            &RaytracerOptions {
+                image_width: WIDTH,
+                aspect_ratio: ASPECT_RATIO,
+                max_depth: 5,
+                samples_per_pixel: 2,
+            },
+        );
+
+        let mut image = raylib::Image::new(WIDTH, HEIGHT);
+        (0..HEIGHT).into_iter().for_each(|line_number| {
+            let line = raytracer.trace_line(line_number);
+            image.set_line(HEIGHT - line_number - 1, line);
+            log::info!("finished line {}", line_number);
+        });
+
         Self {
             title: "Raytracing".to_string(),
             msg: "Output".to_string(),
             canvas_ref: NodeRef::default(),
-            image,
+            image: image.buf().clone(),
         }
     }
 
@@ -41,7 +64,7 @@ impl Component for Greet {
             <div>
                 <h1>{self.title.clone()}</h1>
                 <p>{self.msg.clone()}</p>
-                <canvas width={"400"} height={"256"} ref={self.canvas_ref.clone()}></canvas>
+                <canvas width={WIDTH.to_string()} height={HEIGHT.to_string()} ref={self.canvas_ref.clone()}></canvas>
             </div>
         }
     }
@@ -60,7 +83,7 @@ impl Component for Greet {
             .unwrap();
 
         let image_data =
-            web_sys::ImageData::new_with_u8_clamped_array(Clamped(&self.image), 400).unwrap();
+            web_sys::ImageData::new_with_u8_clamped_array(Clamped(&self.image), WIDTH).unwrap();
 
         context.put_image_data(&image_data, 0.0, 0.0);
     }
