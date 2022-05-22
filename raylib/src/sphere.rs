@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::{hittable::DidHit, material::Material};
+use crate::{hittable::DidHit, material::Material, scene::MaterialId};
 
 use super::{
     hittable::{HitRecord, Hittable},
@@ -11,15 +11,15 @@ use super::{
 pub struct Sphere {
     center: Point3,
     radius: f64,
-    material: Arc<dyn Material + Send + Sync>,
+    material_id: MaterialId,
 }
 
 impl Sphere {
-    pub fn new(center: Point3, radius: f64, material: Arc<dyn Material + Send + Sync>) -> Self {
+    pub fn new(center: Point3, radius: f64, material_id: MaterialId) -> Self {
         Sphere {
             center,
             radius,
-            material,
+            material_id,
         }
     }
 }
@@ -50,7 +50,7 @@ impl Hittable for Sphere {
             rec.p = r.at(rec.t);
             let outward_normal = (rec.p - self.center) / self.radius;
             rec.set_face_normal(r, &outward_normal);
-            rec.set_material(&self.material);
+            rec.set_material_id(self.material_id);
 
             return DidHit::Hit(rec);
         }

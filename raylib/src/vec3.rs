@@ -2,7 +2,10 @@ use std::ops::{self, Range};
 
 use overload::overload;
 
-use crate::util::{clamp, random_double, random_double_in_range};
+use crate::{
+    rand::Rand,
+    util::{clamp, random_double_in_range},
+};
 
 pub type Point3 = Vec3;
 pub type Color = Vec3;
@@ -16,33 +19,37 @@ impl Vec3 {
     pub fn new(x: f64, y: f64, z: f64) -> Self {
         Self { e: [x, y, z] }
     }
-    pub fn random() -> Self {
-        Self::new(random_double(), random_double(), random_double())
-    }
-    pub fn random_in_range(range: Range<f64>) -> Self {
+    pub fn random(rand: &mut Rand) -> Self {
         Self::new(
-            random_double_in_range(&range),
-            random_double_in_range(&range),
-            random_double_in_range(&range),
+            rand.random_double(),
+            rand.random_double(),
+            rand.random_double(),
         )
     }
-    pub fn random_in_unit_sphere() -> Self {
-        let mut p = Self::random_in_range(-1.0..1.0);
+    pub fn random_in_range(range: Range<f64>, rand: &mut Rand) -> Self {
+        Self::new(
+            random_double_in_range(&range, rand),
+            random_double_in_range(&range, rand),
+            random_double_in_range(&range, rand),
+        )
+    }
+    pub fn random_in_unit_sphere(rand: &mut Rand) -> Self {
+        let mut p = Self::random_in_range(-1.0..1.0, rand);
         while p.length_squared() >= 1.0 {
-            p = Self::random_in_range(-1.0..1.0);
+            p = Self::random_in_range(-1.0..1.0, rand);
         }
         p
     }
-    pub fn random_in_unit_disk() -> Self {
+    pub fn random_in_unit_disk(rand: &mut Rand) -> Self {
         let mut p = Vec3::new(
-            random_double_in_range(&(-1.0..1.0)),
-            random_double_in_range(&(-1.0..1.0)),
+            random_double_in_range(&(-1.0..1.0), rand),
+            random_double_in_range(&(-1.0..1.0), rand),
             0.0,
         );
         while p.length_squared() >= 1.0 {
             p = Vec3::new(
-                random_double_in_range(&(-1.0..1.0)),
-                random_double_in_range(&(-1.0..1.0)),
+                random_double_in_range(&(-1.0..1.0), rand),
+                random_double_in_range(&(-1.0..1.0), rand),
                 0.0,
             );
         }
@@ -173,8 +180,8 @@ pub fn unit_vector(v: &Vec3) -> Vec3 {
     *v / v.length()
 }
 
-pub fn random_unit_vector() -> Vec3 {
-    unit_vector(&Vec3::random_in_unit_sphere())
+pub fn random_unit_vector(rand: &mut Rand) -> Vec3 {
+    unit_vector(&Vec3::random_in_unit_sphere(rand))
 }
 
 pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {

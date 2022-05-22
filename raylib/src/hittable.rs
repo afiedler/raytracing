@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use crate::{
     material::{Lambertian, Material},
+    scene::MaterialId,
     vec3::Color,
 };
 
@@ -21,7 +22,7 @@ pub struct HitRecord {
     pub normal: Vec3,
     pub t: f64,
     pub front_face: bool,
-    pub material: Arc<dyn Material + Send + Sync>,
+    pub material_id: MaterialId,
 }
 
 impl HitRecord {
@@ -34,8 +35,12 @@ impl HitRecord {
         }
     }
 
-    pub fn set_material(&mut self, material: &Arc<dyn Material + Send + Sync>) {
-        self.material = material.clone()
+    pub fn set_material_id(&mut self, material_id: MaterialId) {
+        self.material_id = material_id
+    }
+
+    pub fn material_id(&self) -> MaterialId {
+        self.material_id
     }
 
     pub fn default() -> HitRecord {
@@ -44,7 +49,7 @@ impl HitRecord {
             normal: Vec3::new(0.0, 0.0, 0.0),
             t: 0.0,
             front_face: false,
-            material: Arc::new(Lambertian::new(Color::new(1.0, 0.0, 0.0))),
+            material_id: 0,
         }
     }
 }

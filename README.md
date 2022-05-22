@@ -4,7 +4,9 @@
 
 This is a Rust implementation of [Raytracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html).
 
-There is both a web app and a CLI within this repo. Currently, the CLI is multithreaded, but the web version is not.
+There is both a web app and a CLI within this repo. Both are multithreaded, and the web app uses
+[`SharedArrayBuffer`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer)
+and [`wasm_thread`](https://crates.io/crates/wasm_thread) for threading.
 
 ## CLI
 
@@ -16,15 +18,31 @@ cargo run --release
 
 ## Web App
 
-The web app is very slow and raytraces on the main thread. I hope to move it into a web worker later. Start the web app with:
+The web app is made of two parts: `raylib-web`, a lightweight wrapper library around the core raytracer in `raylib`,
+and `raycaster-web` a React-based web app.
+
+Build `raylib-web` with:
 
 ```
-cargo xtask start
+cd raylib-web
+./build.sh
 ```
 
-Build an optimized version with and serve with [http-server](https://crates.io/crates/http-server)
+### Building `raycaster-web`
+
+You need to serve the web app over HTTPS for `SharedArrayBuffer` to work. Create and install a certificate for
+`localhost` with:
 
 ```
-cargo xtask dist --release
-http-server target/release/dist --port 8000
+brew install mkcert
+cd raycaster-web
+mkdir -p .cert && mkcert -key-file ./.cert/key.pem -cert-file ./.cert/cert.pem 'localhost'
+```
+
+Next, start Vite:
+
+```
+# from within raycaster-web
+npm install
+npm run dev
 ```
