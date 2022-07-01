@@ -11,20 +11,22 @@ fn main() {
     let height = 800;
     let aspect_ratio = width as f64 / height as f64;
     let mut rand = Rand::new();
-    let world = Arc::new(random_scene(&mut rand));
-    let image_mutex = Arc::new(Mutex::new(Image::new(width, height)));
+    let scene = random_scene(&mut rand);
+    let image_mutex = Mutex::new(Image::new(width, height));
     let raytracer = Arc::new(Raytracer::new(
-        world,
+        scene,
         &RaytracerOptions {
             image_width: width,
             aspect_ratio,
             max_depth: 50,
-            samples_per_pixel: 5,
+            samples_per_pixel: 1,
         },
     ));
 
     (0..height).into_par_iter().for_each(|line_number| {
-        let mut rand = Rand::new();
+        let mut rand_seed: [u8; 16] = [0; 16];
+        getrandom::getrandom(&mut rand_seed);
+        let mut rand = Rand::new_with_seed(u128::from_le_bytes(rand_seed));
         let line = raytracer.trace_line(line_number, &mut rand);
         let mut image = image_mutex.lock().unwrap();
         image.set_line(line_number, line);
@@ -39,5 +41,7 @@ fn main() {
         }
     }
 
-    image.save_with_format("./output-draft.png", image::ImageFormat::Png);
+    image
+        .save_with_format("./output-draft.png", image::ImageFormat::Png)
+        .unwrap();
 }

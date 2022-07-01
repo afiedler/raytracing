@@ -9,3 +9,4 @@ edition = "2021"
 raylib = { path = "../raylib" }
 image = { version = "0.24"}
 rayon = "1.5"
+getrandom = { version = "0.2" }

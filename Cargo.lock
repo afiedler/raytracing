@@ -599,6 +599,7 @@ dependencies = [
 name = "raycli"
 version = "0.1.0"
 dependencies = [
+ "getrandom",
  "image",
  "raylib",
  "rayon",
