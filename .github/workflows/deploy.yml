@@ -49,8 +49,8 @@ jobs:
             ${{ runner.OS }}-node-
             ${{ runner.OS }}-
 
-      - name: Build raytracer-web
-        working-directory: raytracer-web
+      - name: Build raytracing-web
+        working-directory: raytracing-web
         run: |
           npx ci 
           npm run build

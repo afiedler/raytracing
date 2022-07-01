@@ -59,7 +59,7 @@ function App() {
 }
 
 const SafariWarning = () => (
-  <div className="bg-red-700 text-white px-6">
+  <div className="bg-red-700 text-white px-6 py-1">
     This demo does not work on Safari because{" "}
     <a
       href="https://bugs.webkit.org/show_bug.cgi?id=22723"
