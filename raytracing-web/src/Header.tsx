@@ -1,3 +1,5 @@
+import GithubIcon from "./GithubIcon";
+
 export interface HeaderProps {
   state: string;
   onRaytraceClick: () => void;
@@ -23,6 +25,16 @@ export default function Header(props: HeaderProps) {
             >
               Raytrace!
             </button>
+          </div>
+          <div className="flex items-center">
+            <div className="flex-shrink-0 text-white px-2 border-r-solid border-r-2 border-r-gray-300">
+              <a href="https://andyfiedler.com">andyfiedler.com</a>
+            </div>
+            <div className="flex-shrink-0 text-white px-2">
+              <a href="https://github.com/afiedler/raytracing">
+                <GithubIcon className="text-white" />
+              </a>
+            </div>
           </div>
         </div>
       </div>

@@ -19,7 +19,7 @@ cargo run --release
 ## Web App
 
 The web app is made of two parts: `raylib-web`, a lightweight wrapper library around the core raytracer in `raylib`,
-and `raycaster-web` a React-based web app.
+and `raytracer-web` a React-based web app.
 
 Build `raylib-web` with:
 
@@ -28,21 +28,21 @@ cd raylib-web
 ./build.sh
 ```
 
-### Building `raycaster-web`
+### Building `raytracer-web`
 
 You need to serve the web app over HTTPS for `SharedArrayBuffer` to work. Create and install a certificate for
 `localhost` with:
 
 ```
 brew install mkcert
-cd raycaster-web
+cd raytracer-web
 mkdir -p .cert && mkcert -key-file ./.cert/key.pem -cert-file ./.cert/cert.pem 'localhost'
 ```
 
 Next, start Vite:
 
 ```
-# from within raycaster-web
+# from within raytracer-web
 npm install
 npm run dev
 ```
