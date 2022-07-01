@@ -1,1 +1,0 @@
-async function e(){let a=await import("./weblib-c864b2a6.js");await a.default(),a.run(),self.addEventListener("message",t=>{t.data.type==="raycast"&&a.raycast()}),self.postMessage({type:"ready"})}e();
