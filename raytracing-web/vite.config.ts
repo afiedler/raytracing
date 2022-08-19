@@ -1,12 +1,16 @@
 import * as fs from "fs";
+import * as path from "path";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import { ServerOptions } from "https";
 
-let https = {};
-if (fs.existsSync("./.cert/key.pem") && fs.existsSync("./cert/cert.pem")) {
+let https = {} as ServerOptions;
+const keyFile = path.resolve(__dirname, "./.cert/key.pem");
+const certFile = path.resolve(__dirname, "./.cert/cert.pem");
+if (fs.existsSync(keyFile) && fs.existsSync(certFile)) {
   https = {
-    key: fs.readFileSync("./.cert/key.pem"),
-    cert: fs.readFileSync("./.cert/cert.pem"),
+    key: fs.readFileSync(keyFile, "utf-8"),
+    cert: fs.readFileSync(certFile, "utf-8"),
   };
 }
 
