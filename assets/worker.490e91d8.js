@@ -1,1 +1,0 @@
-async function t(){let a=await import("./weblib-7b07c44b.js");await a.default(),a.run(),self.addEventListener("message",e=>{e.data.type==="raytrace"&&a.raytrace()}),self.postMessage({type:"ready"})}t();
