@@ -30,10 +30,10 @@ function App() {
     const r = new ResizeObserver((entries) => {
       for (const entry of entries) {
         if (entry.target === canvasContainerRef.current) {
-          canvasRef.current!.style.width = `${entry.contentRect.width}px`;
-          canvasRef.current!.style.height = `${
-            (entry.contentRect.width * 800) / 1200
-          }px`;
+          const width = Math.min(Math.floor(entry.contentRect.width), 1200);
+          const height = Math.round((width * 800) / 1200);
+          canvasRef.current!.style.width = `${width}px`;
+          canvasRef.current!.style.height = `${height}px`;
         }
       }
     });
@@ -77,7 +77,7 @@ function App() {
         <canvas width={1200} height={800} ref={canvasRef} />
       </div>
 
-      <div className="flex items-center w-full mt-6 ml-1 mr-1">
+      <div className="flex items-center mt-6 ml-1 mr-1">
         <div className="flex-shrink-0 text-gray-200 px-4 border-r-solid border-r-2 border-r-gray-300">
           <a href="https://andyfiedler.com">andyfiedler.com</a>
         </div>
