@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import Header from "./Header";
+import GithubIcon from "./GithubIcon";
+import { Header } from "./Header";
 import { whenWorkersAreReady } from "./whenWorkersAreReady";
 
 type State =
@@ -15,6 +16,7 @@ const isSafari =
 function App() {
   const [state, setState] = useState<State>({ type: "awaiting-workers" });
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(
     () =>
@@ -23,6 +25,24 @@ function App() {
       }),
     []
   );
+
+  useEffect(() => {
+    const r = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.target === canvasContainerRef.current) {
+          canvasRef.current!.style.width = `${entry.contentRect.width}px`;
+          canvasRef.current!.style.height = `${
+            (entry.contentRect.width * 800) / 1200
+          }px`;
+        }
+      }
+    });
+
+    r.observe(canvasContainerRef.current!);
+    return () => {
+      r.disconnect();
+    };
+  });
 
   const onButtonClick = useCallback(() => {
     if (state.type !== "workers-ready") return;
@@ -53,7 +73,20 @@ function App() {
           !(state.type === "workers-ready" || state.type === "finished")
         }
       />
-      <canvas width={1200} height={800} ref={canvasRef} />
+      <div ref={canvasContainerRef} className="w-full bg-slate-600">
+        <canvas width={1200} height={800} ref={canvasRef} />
+      </div>
+
+      <div className="flex items-center w-full mt-6 ml-1 mr-1">
+        <div className="flex-shrink-0 text-gray-200 px-4 border-r-solid border-r-2 border-r-gray-300">
+          <a href="https://andyfiedler.com">andyfiedler.com</a>
+        </div>
+        <div className="flex-shrink-0 text-gray-200 px-4">
+          <a href="https://github.com/afiedler/raytracing">
+            <GithubIcon className="text-gray-200" />
+          </a>
+        </div>
+      </div>
     </>
   );
 }
