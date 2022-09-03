@@ -37,7 +37,7 @@ jobs:
         run: |
           cd ./raylib-web && ./build.sh
 
-      - name: Use NPM 7
+      - name: Use latest NPM
         run: npm i -g npm@latest
 
       - name: Cache dependencies
